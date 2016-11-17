@@ -1,0 +1,24 @@
+<div ng-controller = 'TeamsController'>
+  <fieldset><legend>Teams Controller</legend>
+  <form ng-submit = create()>
+    Name: <input type="test" ng-model = "newTeam.name">
+    <input type="submit" value="Add new team">
+  </form>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody ng-repeat = "team in teams">
+      <tr>
+        <td>{{team.name}}</td>
+
+        <td><button ng-click = "delete($index)">Remove the team</button></td>
+      </tr>
+
+    </tbody>
+  </table>
+  </fieldset>
+</div>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+ <!-- THESE TWO VERSIONS BELOW MUST MATCH (good thing bower will catch that for us, but be aware if you are using CDN's)!!! -->
+    <script src="angular/angular.js"></script>
+    <script src="angular-route/angular-route.js"></script>
+<script>
+    //  inject the ngRoute dependency in the module.
+    var myApp = angular.module('myApp', ['ngRoute']);
+    //  use the config method to set up routing:
+    myApp.config(function ($routeProvider) {
+      $routeProvider
+        .when('/players',{
+            templateUrl: 'partials/players.html',
+        })
+        .when('/teams',{
+            templateUrl: 'partials/teams.html'
+        })
+        .when('/associations',{
+            templateUrl: 'partials/associations.html'
+        })
+        .otherwise({
+          redirectTo: '/'
+        });
+    });
+    myApp.factory('playerFactory', function(){
+      console.log("playerFactory");
+      var factory = {};
+      var players = [];
+      factory.create = function(player,callback){
+        player.team = "";
+        players.push(player);
+        callback(players);
+      }
+      factory.delete = function(id,callback){
+        players.splice(id,1);
+        callback(players);
+      }
+      factory.index = function(callback){
+        callback(players);
+      }
+      factory.addPlayerToTeam = function(data){
+        players[data.playerIdx].team = data.team;
+      }
+      factory.removePlayerFromTeam = function($index){
+        players[$index].team = "";
+      }
+
+      return factory;
+    })
+    myApp.factory('teamFactory', function(){
+      console.log("teamFactory");
+      var factory = {};
+      var teams = [];
+      factory.create = function(team,callback){
+        teams.push(team);
+        callback(teams);
+      }
+      factory.delete = function(id,callback){
+        teams.splice(id,1);
+        callback(teams);
+      }
+      factory.index = function(callback){
+        callback(teams);
+      }
+
+      return factory;
+    })
+
+    myApp.controller('PlayersController', function($scope, playerFactory){
+      console.log('PlayersController');
+      $scope.players = [];
+      function setPlayers(data){
+        $scope.players = data;
+        $scope.player = {}
+      }
+      $scope.index = function(){
+        playerFactory.index(setPlayers);
+      }
+      $scope.create = function(){
+        playerFactory.create($scope.newPlayer, setPlayers);
+        $scope.newPlayer = {};
+      }
+      $scope.delete = function(id){
+        playerFactory.delete(id,setPlayers)
+      }
+    })
+    myApp.controller('TeamsController', function($scope, teamFactory){
+      console.log('TeamsController');
+      $scope.teams = [];
+      function setTeams(data){
+        $scope.teams = data;
+        $scope.team = {};
+      }
+      $scope.index = function(){
+        teamFactory.index(setTeams);
+      }
+      $scope.create = function(){
+        teamFactory.create($scope.newTeam, setTeams);
+        $scope.newTeam = {};
+      }
+      $scope.delete = function(id){
+        teamFactory.delete(id,setTeams);
+      }
+    })
+
+    myApp.controller('AssociationsController', function($scope, teamFactory, playerFactory){
+      console.log('AssociationsController');
+      $scope.teams = [];
+      $scope.players = [];
+      playerFactory.index(function(players){
+        $scope.players = players;
+      })
+      teamFactory.index(function(teams){
+        $scope.teams = teams;
+      })
+      $scope.addPlayerToTeam = function(){
+        playerFactory.addPlayerToTeam($scope.newAssoc);
+      }
+      $scope.removePlayerFromTeam = function($index){
+        playerFactory.removePlayerFromTeam($index);
+      }
+    })
+
+
+    // myApp.controller('UserListsController', function($scope, customerFactory){
+    //   console.log('UserListsController');
+    //   $scope.customers = [];
+    //
+    //   function setCostomers(data){
+    //     $scope.customers = data;
+    //
+    //   }
+    //
+    //   customerFactory.index(setCostomers);
+    // })
+
+    //  build the controllers
+    // myApp.controller('view1Controller', function ($scope) {
+    //   $scope.sports = ['golf', 'basketball', 'hockey', 'tennis', 'football'];
+    // });
+    // myApp.controller('view2Controller', function ($scope) {
+    //   $scope.message = 'We are using another controller';
+    // });
+    </script>
+  </head>
+  <body>
+    <h1>angluar</h1>
+    <div ng-app='myApp'>
+
+        <a href="#/players">players</a> | <a href="#/teams">Teams</a> | <a href="#/associations">Associations</a>
+        <div ng-view="">
+        </div>
+    </div>
+  </body>
+</html>
